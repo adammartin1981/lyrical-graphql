@@ -1,5 +1,8 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+import { Schema, model } from 'mongoose'
+
+type Lyric = Document & {
+  likes: number
+}
 
 const LyricSchema = new Schema({
   song: {
@@ -10,14 +13,15 @@ const LyricSchema = new Schema({
   content: { type: String }
 });
 
-LyricSchema.statics.like = function(id) {
-  const Lyric = mongoose.model('lyric');
+// @ts-ignore
+export const LyricModel = model<Lyric>('lyric', LyricSchema);
 
-  return Lyric.findById(id)
+LyricSchema.statics.like = function(id) {
+  return LyricModel.findById(id)
     .then(lyric => {
       ++lyric.likes;
       return lyric.save();
     })
 }
 
-mongoose.model('lyric', LyricSchema);
+
