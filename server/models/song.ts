@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose'
+import { LyricModel } from './lyric'
 
 const SongSchema = new Schema({
   title: { type: String },
@@ -10,15 +11,15 @@ const SongSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'lyric'
   }]
+}, {
+  usePushEach: true
 });
 
 SongSchema.statics.addLyric = function(id, content) {
-  const Lyric = model('lyric');
-
   return this.findById(id)
     .then(song => {
-      const lyric = new Lyric({ content, song })
-      song.lyrics.push(lyric)
+      const lyric = new LyricModel({ content, song })
+      song.lyrics.push(lyric.id)
       return Promise.all([lyric.save(), song.save()])
         .then(([lyric, song]) => song);
     });
